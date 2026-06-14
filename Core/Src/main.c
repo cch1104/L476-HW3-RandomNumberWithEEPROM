@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "string.h"
 #define LED GPIO_PIN_5
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,8 +113,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
  //=========================LCD=================================================//
   lcd_Init();
-  lcd_Puts("Nucleo-L476 002");
-//  lcd_Clear();
+  lcd_Clear();
+  lcd_Goto(0,0);
+  lcd_Puts("Hi! Nucleo-L476 ");
 //==========================LCD END=============================================//
 //==========================I2C=================================================//
   HAL_I2C_Init(&hi2c1);
@@ -131,8 +133,29 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  char rdmsg[] = "1234";
+  char ticker[50];
+  sprintf(ticker,
+          "                %s                ",
+          rdmsg);
+  char window[17];
   while (1)
   {
+	  int len = strlen(ticker);
+
+	      for(int i = 0; i <= len - 16; i++)
+	      {
+	          strncpy(window, &ticker[i], 16);
+	          window[16] = '\0';
+
+	          lcd_Goto(0,1);
+	          lcd_Puts("                ");
+
+	          lcd_Goto(0,1);
+	          lcd_Puts(window);
+
+	          HAL_Delay(250);
+	      }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
