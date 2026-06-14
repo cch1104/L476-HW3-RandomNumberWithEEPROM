@@ -25,6 +25,7 @@
 #include "string.h"
 #define LED GPIO_PIN_5
 #include "stdio.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,7 +61,7 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void WRITE(uint16_t MemLoc, uint8_t *pData, uint16_t len){
-	uint8_t data[5];
+	uint8_t data[32];
 
 	data[0]=(uint8_t) ((MemLoc & 0xFF00) >> 8);
 	data[1]=(uint8_t) (MemLoc & 0xFF);
@@ -86,8 +87,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  int count, i;
-  char wmsg[]={'1','5'};
+//  int count, i;
+//  char wmsg[]={'1','5'};
+  char wmsg[10];
   char rmsg[10];
   /* USER CODE END 1 */
 
@@ -111,33 +113,78 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
- //=========================LCD=================================================//
+  //=======================*LCD initialization*====================================//
   lcd_Init();
   lcd_Clear();
   lcd_Goto(0,0);
   lcd_Puts("Hi! Nucleo-L476 ");
-//==========================LCD END=============================================//
-//==========================I2C=================================================//
+
+  HAL_Delay(3000);
+  lcd_Goto(0,0);
+  lcd_Puts("Generate Random ");
+  HAL_Delay(3000);
+  //==========================LCD END==============================================//
+
+  //=========================Random number generation==============================//
+  srand(HAL_GetTick());
+  int randomNum = rand() % 10000;
+//  int randomNum=2234;
+  sprintf(wmsg, "%d", randomNum);
+  lcd_Goto(0,1);
+  lcd_Puts("randomNum: ");
+  lcd_Puts(wmsg);
+  HAL_Delay(3000);
+  //=========================random number generation end =========================//
+
+  //==========================I2C==================================================//
   HAL_I2C_Init(&hi2c1);
   WRITE(0x1000, (uint8_t*)wmsg, strlen(wmsg)+1);
-  HAL_Delay(5000);
+  HAL_Delay(1000);
   READ(0x1000, (uint8_t*)rmsg, strlen(rmsg)+1);
-  count= 10*(rmsg[0] - '0')+ rmsg[1]-'0';
 
-  for(i=0; i<count; i++){
-	  HAL_GPIO_TogglePin(GPIOA, LED);
-	  HAL_Delay(1000);
-  }
-//==========================I2C END=================================================//
+//  count= 10*(rmsg[0] - '0')+ rmsg[1]-'0';
+//	for(i=0; i<count; i++){
+//	  HAL_GPIO_TogglePin(GPIOA, LED);
+//	  HAL_Delay(1000);
+//	}
+
+  //==========================I2C END=================================================//
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  char rdmsg[] = "1234";
+
+  //==========================Check Write and Read number===========================//
+  lcd_Clear();
+  lcd_Goto(0,0);
+  lcd_Puts("check EEPROM:");
+  HAL_Delay(5000);
+
+  lcd_Goto(0,1);
+  lcd_Puts("w:");
+  lcd_Puts(wmsg);
+  lcd_Puts("  r:");
+  lcd_Puts(rmsg);
+
+  HAL_Delay(10000);
+
+  lcd_Goto(0,1);
+  if(strcmp(wmsg,rmsg)==0){
+	  lcd_Puts("EEPROM OK       ");
+  }else{
+	  lcd_Puts("EEPROM FAIL     ");
+  }
+
+  HAL_Delay(5000);
+  lcd_Goto(0,0);
+  lcd_Puts("Random Number:");
+
+  //==========================Ticker funciton=======================================//
+  //  char rdmsg[] = "1234";//for test ticker function example
   char ticker[50];
   sprintf(ticker,
           "                %s                ",
-          rdmsg);
+		  rmsg);
   char window[17];
   while (1)
   {
