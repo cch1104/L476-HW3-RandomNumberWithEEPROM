@@ -131,6 +131,7 @@ int main(void)
 
   //=========================Random number generation==============================//
 //  srand(HAL_GetTick());
+//  int randomNum=2234;
   uint32_t seed;
 
   HAL_ADC_Start(&hadc1);
@@ -141,7 +142,7 @@ int main(void)
   seed ^= HAL_GetTick();// increasing more random
   srand(seed);
   int randomNum = rand() % 10000;
-//  int randomNum=2234;
+
   sprintf(wmsg, "%d", randomNum);
   lcd_Goto(0,1);
   lcd_Puts("randomNum: ");
