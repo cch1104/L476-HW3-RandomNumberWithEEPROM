@@ -3,7 +3,7 @@
 
 ## Overview
 This project is based on STM32 Nucleo-L476 and demonstrates:
-- ADC-based entropy generating random number generation using rand()
+- ADC-based generating random number generation using rand()
 - EEPROM read/write via I2C
 - LCD display output
 - Data verification between EEPROM write/read
